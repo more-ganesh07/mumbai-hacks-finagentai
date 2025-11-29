@@ -1,0 +1,78 @@
+{
+    "timestamp": "2025-11-27 10:12:37",
+    "profile": {
+        "user_id": "EKL002",
+        "name": "Ganesh Vasant More",
+        "email": "moreganesh631@gmail.com",
+        "broker": "ZERODHA",
+        "products": [
+            "CNC",
+            "NRML",
+            "MIS",
+            "BO",
+            "CO"
+        ],
+        "exchanges": [
+            "NSE",
+            "BSE",
+            "MF",
+            "NFO"
+        ]
+    },
+    "holdings": [
+        {
+            "symbol": "EXCELSOFT",
+            "qty": 125.0,
+            "avg": 120.0,
+            "ltp": 122.76,
+            "pnl": 345.0
+        },
+        {
+            "symbol": "TATASTEEL",
+            "qty": 1.0,
+            "avg": 161.87,
+            "ltp": 169.15,
+            "pnl": 7.28
+        },
+        {
+            "symbol": "INFY",
+            "qty": 2.0,
+            "avg": 1450.0,
+            "ltp": 1472.4,
+            "pnl": 44.8
+        },
+        {
+            "symbol": "HDFCBANK",
+            "qty": 3.0,
+            "avg": 1500.0,
+            "ltp": 1528.5,
+            "pnl": 85.5
+        }
+    ],
+    "mutual_funds": [
+        {
+            "scheme_name": "MOTILAL OSWAL MIDCAP FUND - DIRECT PLAN",
+            "units": 96.559,
+            "avg_nav": 113.9122,
+            "nav": 117.4146,
+            "value": 11337.44,
+            "gain_pct": 3.07
+        },
+        {
+            "scheme_name": "MOTILAL OSWAL LARGE CAP FUND - DIRECT PLAN",
+            "units": 808.836,
+            "avg_nav": 13.5991,
+            "nav": 14.6505,
+            "value": 11849.85,
+            "gain_pct": 7.73
+        },
+        {
+            "scheme_name": "MOTILAL OSWAL SMALL CAP FUND - DIRECT PLAN",
+            "units": 802.603,
+            "avg_nav": 13.7047,
+            "nav": 14.5889,
+            "value": 11709.09,
+            "gain_pct": 6.45
+        }
+    ]
+}

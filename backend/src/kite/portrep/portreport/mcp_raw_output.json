@@ -1,0 +1,224 @@
+{
+    "holdings": {
+        "status": "success",
+        "data": [
+            {
+                "symbol": "EXCELSOFT",
+                "quantity": 125.0,
+                "average_price": 120.0,
+                "last_price": 122.76,
+                "current_value": 15345.0,
+                "investment_value": 15000.0,
+                "pnl": 345.0,
+                "pnl_percentage": 2.3,
+                "source": "mcp"
+            },
+            {
+                "symbol": "TATASTEEL",
+                "quantity": 1.0,
+                "average_price": 161.87,
+                "last_price": 169.15,
+                "current_value": 169.15,
+                "investment_value": 161.87,
+                "pnl": 7.28,
+                "pnl_percentage": 4.5,
+                "source": "mcp"
+            },
+            {
+                "symbol": "INFY",
+                "quantity": 2.0,
+                "average_price": 1450.0,
+                "last_price": 1472.4,
+                "current_value": 2944.8,
+                "investment_value": 2900.0,
+                "pnl": 44.8,
+                "pnl_percentage": 1.54,
+                "source": "dummy"
+            },
+            {
+                "symbol": "HDFCBANK",
+                "quantity": 3.0,
+                "average_price": 1500.0,
+                "last_price": 1528.5,
+                "current_value": 4585.5,
+                "investment_value": 4500.0,
+                "pnl": 85.5,
+                "pnl_percentage": 1.9,
+                "source": "dummy"
+            }
+        ],
+        "summary": {
+            "holdings": [
+                {
+                    "symbol": "EXCELSOFT",
+                    "quantity": 125.0,
+                    "average_price": 120.0,
+                    "last_price": 122.76,
+                    "current_value": 15345.0,
+                    "investment_value": 15000.0,
+                    "pnl": 345.0,
+                    "pnl_percentage": 2.3
+                },
+                {
+                    "symbol": "TATASTEEL",
+                    "quantity": 1.0,
+                    "average_price": 161.87,
+                    "last_price": 169.15,
+                    "current_value": 169.15,
+                    "investment_value": 161.87,
+                    "pnl": 7.28,
+                    "pnl_percentage": 4.5
+                },
+                {
+                    "symbol": "INFY",
+                    "quantity": 2.0,
+                    "average_price": 1450.0,
+                    "last_price": 1472.4,
+                    "current_value": 2944.8,
+                    "investment_value": 2900.0,
+                    "pnl": 44.8,
+                    "pnl_percentage": 1.54
+                },
+                {
+                    "symbol": "HDFCBANK",
+                    "quantity": 3.0,
+                    "average_price": 1500.0,
+                    "last_price": 1528.5,
+                    "current_value": 4585.5,
+                    "investment_value": 4500.0,
+                    "pnl": 85.5,
+                    "pnl_percentage": 1.9
+                }
+            ],
+            "totals": {
+                "total_holdings": 4,
+                "total_investment": 22561.87,
+                "total_current_value": 23044.45,
+                "total_pnl": 482.58,
+                "total_pnl_percentage": 2.14
+            }
+        }
+    },
+    "mutual_funds": {
+        "status": "success",
+        "data": [
+            {
+                "scheme_name": "MOTILAL OSWAL MIDCAP FUND - DIRECT PLAN",
+                "units": 96.559,
+                "average_nav": 113.9122,
+                "current_nav": 117.4146,
+                "investment_value": 10999.25,
+                "current_value": 11337.44,
+                "pnl": 338.19,
+                "pnl_percentage": 3.07,
+                "source": "mcp"
+            },
+            {
+                "scheme_name": "MOTILAL OSWAL LARGE CAP FUND - DIRECT PLAN",
+                "units": 808.836,
+                "average_nav": 13.5991,
+                "current_nav": 14.6505,
+                "investment_value": 10999.45,
+                "current_value": 11849.85,
+                "pnl": 850.4,
+                "pnl_percentage": 7.73,
+                "source": "mcp"
+            },
+            {
+                "scheme_name": "MOTILAL OSWAL SMALL CAP FUND - DIRECT PLAN",
+                "units": 802.603,
+                "average_nav": 13.7047,
+                "current_nav": 14.5889,
+                "investment_value": 10999.45,
+                "current_value": 11709.09,
+                "pnl": 709.64,
+                "pnl_percentage": 6.45,
+                "source": "mcp"
+            }
+        ],
+        "summary": {
+            "mutual_funds": [
+                {
+                    "scheme_name": "MOTILAL OSWAL MIDCAP FUND - DIRECT PLAN",
+                    "units": 96.559,
+                    "average_nav": 113.9122,
+                    "current_nav": 117.4146,
+                    "investment_value": 10999.25,
+                    "current_value": 11337.44,
+                    "pnl": 338.19,
+                    "pnl_percentage": 3.07
+                },
+                {
+                    "scheme_name": "MOTILAL OSWAL LARGE CAP FUND - DIRECT PLAN",
+                    "units": 808.836,
+                    "average_nav": 13.5991,
+                    "current_nav": 14.6505,
+                    "investment_value": 10999.45,
+                    "current_value": 11849.85,
+                    "pnl": 850.4,
+                    "pnl_percentage": 7.73
+                },
+                {
+                    "scheme_name": "MOTILAL OSWAL SMALL CAP FUND - DIRECT PLAN",
+                    "units": 802.603,
+                    "average_nav": 13.7047,
+                    "current_nav": 14.5889,
+                    "investment_value": 10999.45,
+                    "current_value": 11709.09,
+                    "pnl": 709.64,
+                    "pnl_percentage": 6.45
+                }
+            ],
+            "totals": {
+                "total_schemes": 3,
+                "total_investment": 32998.15,
+                "total_current_value": 34896.38,
+                "total_pnl": 1898.23,
+                "total_pnl_percentage": 5.75
+            }
+        }
+    },
+    "profile": {
+        "status": "success",
+        "data": {
+            "user_id": "EKL002",
+            "user_name": "Ganesh Vasant More",
+            "email": "moreganesh631@gmail.com",
+            "broker": "ZERODHA",
+            "user_type": "individual/res_no_nn",
+            "products": [
+                "CNC",
+                "NRML",
+                "MIS",
+                "BO",
+                "CO"
+            ],
+            "exchanges": [
+                "NSE",
+                "BSE",
+                "MF",
+                "NFO"
+            ]
+        },
+        "summary": {
+            "user_id": "EKL002",
+            "user_name": "Ganesh Vasant More",
+            "email": "moreganesh631@gmail.com",
+            "broker": "ZERODHA",
+            "user_type": "individual/res_no_nn",
+            "products": [
+                "CNC",
+                "NRML",
+                "MIS",
+                "BO",
+                "CO"
+            ],
+            "exchanges": [
+                "NSE",
+                "BSE",
+                "MF",
+                "NFO"
+            ]
+        }
+    }
+}

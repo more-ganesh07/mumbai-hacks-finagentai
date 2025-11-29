@@ -1,0 +1,26 @@
+# Data manipulation
+pandas>=1.5.0
+numpy>=1.23.0
+
+# Finance data
+yfinance>=0.2.27
+
+# Plotting and visualization
+matplotlib>=3.7.0
+seaborn>=0.12.2
+plotly>=5.15.0
+Pillow>=10.0.0
+
+# MCP server (if using MCP chat server)
+mcp-server>=0.1.0
+
+# Optional: for date handling
+python-dateutil>=2.8.2
+
+# Optional: interactive widgets if needed in future
+ipywidgets>=8.1.0
+
+# Report Generation
+kaleido
+markdown
+xhtml2pdf

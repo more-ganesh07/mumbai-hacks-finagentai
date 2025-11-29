@@ -1,0 +1,102 @@
+:root{
+  --ai-voice-size: 40px;
+  --ai-voice-ink: rgba(0,0,0,0.9);
+  --ai-voice-muted: rgba(0,0,0,0.35);
+   --tooltip-bg: #cc6b00;
+  --tooltip-fg: #fff;
+}
+
+/* compact mic button */
+.ai-voice-btn {
+  width: var(--ai-voice-size);
+  height: var(--ai-voice-size);
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: background-color 140ms ease, transform 80ms ease, opacity 120ms ease;
+  padding: 0;
+}
+.ai-voice-btn:hover { background: rgba(0,0,0,0.03); }
+.ai-voice-btn:active { transform: translateY(1px); }
+
+.mic-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--accent-orange); /* 🔥 mic icon now orange */
+}
+
+/* disabled visual state */
+.ai-voice-btn--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ai-voice-btn--disabled:hover { background: transparent; transform: none; }
+
+/* tooltip wrapper */
+/* Uses data-tooltip attr — appears on hover when non-empty */
+.ai-voice-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* tooltip styling (hidden by default) */
+.ai-voice-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-fg);
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  z-index: 50;
+}
+
+/* small arrow */
+.ai-voice-tooltip::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: var(--tooltip-bg);
+  transform-origin: center;
+  clip-path: polygon(50% 0, 0 100%, 100% 100%);
+  opacity: 0;
+  transition: opacity 160ms ease;
+  z-index: 50;
+}
+
+/* show tooltip only when data-tooltip is non-empty and hovered */
+.ai-voice-tooltip:hover::after,
+.ai-voice-tooltip:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* accessibility: reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ai-voice-tooltip::after,
+  .ai-voice-tooltip::before {
+    transition: none;
+  }
+}
+
+/* dark theme tweaks */
+@media (prefers-color-scheme: dark) {
+  :root { --ai-voice-ink: rgba(255,255,255,0.9); --ai-voice-muted: rgba(255,255,255,0.75);  --tooltip-bg: #cc6b00; }
+  .mic-icon { color: var(--ai-voice-ink); }
+}

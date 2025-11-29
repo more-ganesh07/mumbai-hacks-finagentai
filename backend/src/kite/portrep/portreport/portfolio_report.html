@@ -1,0 +1,1254 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Portfolio Analysis Report</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #ffffff;
+            font-size: 11pt;
+        }
+        
+        .page {
+            background: white;
+            padding: 20px;
+            page-break-after: always;
+        }
+        
+        .page:last-child {
+            page-break-after: auto;
+        }
+        
+        /* Header Styles */
+        .header {
+            border-bottom: 4px solid #2563eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28pt;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+        }
+        
+        .header .subtitle {
+            font-size: 11pt;
+            color: #64748b;
+        }
+        
+        /* Section Styles */
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            display: table;
+            width: 100%;
+        }
+        
+        .section-title .number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: #2563eb;
+            color: white;
+            border-radius: 6px;
+            text-align: center;
+            line-height: 35px;
+            font-size: 16pt;
+            font-weight: bold;
+            margin-right: 10px;
+            float: left;
+        }
+        
+        .subsection-title {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #334155;
+            margin: 20px 0 12px 0;
+        }
+        
+        /* Profile Card */
+        .profile-card {
+            background: #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            color: white;
+            margin-bottom: 25px;
+        }
+        
+        .profile-grid {
+            display: table;
+            width: 100%;
+        }
+        
+        .profile-item {
+            display: table-cell;
+            width: 50%;
+            padding: 8px;
+            vertical-align: top;
+        }
+        
+        .profile-label {
+            font-size: 9pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+        
+        .profile-value {
+            font-size: 12pt;
+            font-weight: bold;
+        }
+        
+        /* Stats Cards */
+        .stats-container {
+            display: table;
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            display: table-cell;
+            width: 33.33%;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #2563eb;
+            margin: 0 5px;
+        }
+        
+        .stat-card.positive {
+            border-left-color: #10b981;
+        }
+        
+        .stat-card.negative {
+            border-left-color: #ef4444;
+        }
+        
+        .stat-label {
+            font-size: 9pt;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+        
+        .stat-value {
+            font-size: 20pt;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .stat-change {
+            font-size: 11pt;
+            margin-top: 4px;
+            font-weight: bold;
+        }
+        
+        .stat-change.positive {
+            color: #10b981;
+        }
+        
+        .stat-change.negative {
+            color: #ef4444;
+        }
+        
+        /* Tables */
+        .table-container {
+            margin: 15px 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border: 1px solid #e2e8f0;
+        }
+        
+        thead {
+            background: #1e40af;
+            color: white;
+        }
+        
+        th {
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 10pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 10pt;
+        }
+        
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .symbol-cell {
+            font-weight: bold;
+            color: #1e40af;
+            font-size: 11pt;
+        }
+        
+        .positive-value {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .negative-value {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        
+        /* Stock Analysis Card */
+        .stock-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid #2563eb;
+        }
+        
+        .stock-header {
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 15px;
+        }
+        
+        .stock-name {
+            font-size: 16pt;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+        
+        .stock-metrics {
+            display: table;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .metric {
+            display: table-cell;
+            width: 25%;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 0 2px;
+        }
+        
+        .metric-label {
+            font-size: 8pt;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+        
+        .metric-value {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .chart-container {
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        
+        .info-box p {
+            margin-bottom: 8px;
+            color: #1e40af;
+            font-size: 10pt;
+            line-height: 1.6;
+        }
+        
+        .info-box strong {
+            color: #1e3a8a;
+            font-weight: bold;
+        }
+        
+        /* Analysis Container Styles */
+        .analysis-container {
+            margin-top: 15px;
+        }
+        
+        .analysis-section {
+            background: #ffffff;
+            border-left: 4px solid #3b82f6;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .analysis-section-title {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .analysis-icon {
+            font-size: 14pt;
+            margin-right: 8px;
+        }
+        
+        .analysis-content {
+            color: #334155;
+            line-height: 1.7;
+        }
+        
+        .analysis-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        
+        .analysis-list li {
+            padding: 8px 0 8px 25px;
+            position: relative;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 10pt;
+            line-height: 1.6;
+        }
+        
+        .analysis-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .analysis-list li:before {
+            content: "▸";
+            position: absolute;
+            left: 8px;
+            color: #3b82f6;
+            font-weight: bold;
+        }
+        
+        /* Keyword Highlighting */
+        .buy-tag, .accumulate-tag {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        
+        .sell-tag {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        
+        .hold-tag {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        
+        .positive-keyword {
+            color: #059669;
+            font-weight: bold;
+        }
+        
+        .negative-keyword {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+            font-size: 9pt;
+            border-top: 2px solid #e2e8f0;
+            margin-top: 30px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        /* Print specific fixes */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .page {
+                page-break-after: always;
+            }
+            
+            .stock-card, .analysis-section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="header">
+        <h1>Investment Portfolio Analysis Report</h1>
+        <div class="subtitle">Generated on 2025-11-27 10:12:37</div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">
+            <span class="number">1</span>
+            Client Profile & Account Summary
+        </div>
+        <div class="profile-card">
+            <div class="profile-grid">
+    
+                <div class="profile-item">
+                    <div class="profile-label">Client Name</div>
+                    <div class="profile-value">Ganesh Vasant More</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Client ID</div>
+                    <div class="profile-value">EKL002</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Brokerage</div>
+                    <div class="profile-value">ZERODHA</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Email Contact</div>
+                    <div class="profile-value">moreganesh631@gmail.com</div>
+                </div>
+    
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">
+            <span class="number">2</span>
+            Market Sentiment Dashboard
+        </div>
+        <p style="color: #64748b; margin-bottom: 20px;">Current Indian market overview with major indices performance and sentiment analysis.</p>
+    
+        <div class="chart-container">
+            <img src="C:\Users\lenovo\OneDrive\Desktop\Hrishi\hacks\backend\KiteInfi\src\kite\portrep\portreport\viz\charts\market_sentiment_dashboard.png" alt="Market Sentiment Dashboard">
+        </div>
+        
+        <div class="info-box">
+            <p><strong>Top Left - Major Indices Performance:</strong> Shows percentage change for key Indian indices (NIFTY 50, SENSEX, BANKNIFTY, etc.) over the selected period.</p>
+            <p><strong>Top Right - NIFTY 50 vs India VIX:</strong> Displays the inverse relationship between market performance and volatility. Higher VIX indicates increased market fear.</p>
+            <p><strong>Bottom Left - Relative Performance:</strong> Compares normalized performance of different indices from a common starting point (100).</p>
+            <p><strong>Bottom Right - Fear & Greed Index:</strong> Market sentiment gauge based on India VIX. Extreme Fear (&lt;25) suggests buying opportunity, Extreme Greed (&gt;75) suggests caution.</p>
+        </div>
+    </div>
+    </div><div class="page">
+    <div class="section">
+        <div class="section-title">
+            <span class="number">3</span>
+            Portfolio Performance Overview
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-label">Total Investment</div>
+                <div class="stat-value">₹22,561.87</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Current Value</div>
+                <div class="stat-value">₹23,044.45</div>
+            </div>
+            <div class="stat-card positive">
+                <div class="stat-label">Total P&L</div>
+                <div class="stat-value">₹482.58</div>
+                <div class="stat-change positive">+2.14%</div>
+            </div>
+        </div>
+    
+        <div class="subsection-title">Portfolio Performance Chart</div>
+        <p style="color: #64748b; margin-bottom: 15px;">Year-to-date performance tracking of your equity holdings with benchmark comparison.</p>
+        <div class="chart-container">
+            <img src="C:\Users\lenovo\OneDrive\Desktop\Hrishi\hacks\backend\KiteInfi\src\kite\portrep\portreport\viz\charts\portfolio_performance_tracker.png" alt="Portfolio Performance Tracker">
+        </div>
+        
+        <div class="subsection-title">Holdings Summary</div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Quantity</th>
+                        <th>Avg. Cost</th>
+                        <th>Current Price</th>
+                        <th>Net P&L</th>
+                    </tr>
+                </thead>
+                <tbody>
+    
+                    <tr>
+                        <td class="symbol-cell">EXCELSOFT</td>
+                        <td>125.0</td>
+                        <td>₹120.00</td>
+                        <td>₹122.76</td>
+                        <td class="positive-value">₹345.00</td>
+                    </tr>
+        
+                    <tr>
+                        <td class="symbol-cell">TATASTEEL</td>
+                        <td>1.0</td>
+                        <td>₹161.87</td>
+                        <td>₹169.15</td>
+                        <td class="positive-value">₹7.28</td>
+                    </tr>
+        
+                    <tr>
+                        <td class="symbol-cell">INFY</td>
+                        <td>2.0</td>
+                        <td>₹1,450.00</td>
+                        <td>₹1,472.40</td>
+                        <td class="positive-value">₹44.80</td>
+                    </tr>
+        
+                    <tr>
+                        <td class="symbol-cell">HDFCBANK</td>
+                        <td>3.0</td>
+                        <td>₹1,500.00</td>
+                        <td>₹1,528.50</td>
+                        <td class="positive-value">₹85.50</td>
+                    </tr>
+        
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div><div class="page">
+        <div class="section">
+            <div class="section-title">
+                <span class="number">4.1</span>
+                EXCELSOFT - Detailed Analysis
+            </div>
+            
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-name">EXCELSOFT</div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Position</div>
+                        <div class="metric-value">125.0 shares</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Avg. Cost</div>
+                        <div class="metric-value">₹120.00</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Current Price</div>
+                        <div class="metric-value">₹122.76</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Net P&L</div>
+                        <div class="metric-value positive-value">₹345.00</div>
+                    </div>
+                </div>
+        
+                <div class="subsection-title">Research & Analysis</div>
+                <div class="analysis-container">
+        <div class="analysis-section" style="border-left-color: #10b981;">
+            <div class="analysis-section-title" style="color: #10b981;">
+                <span class="analysis-icon">📊</span>
+                Investment Verdict
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Based on the provided data and market trends, we issue a **<span class="buy-tag">Buy</span>** verdict for EXCELSOFT.</li><li>The company operates in the growing online education market in India, which is expected to witness significant <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> driven by skill development and employment.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #3b82f6;">
+            <div class="analysis-section-title" style="color: #3b82f6;">
+                <span class="analysis-icon">💰</span>
+                Financial Health Assessment
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Assessment
+EXCELSOFT's financial health appears to be stable, with a total return of 3.33% over the past two years and an annualized return of 1.65%.</li><li>The standard deviation of the close price is relatively low at 2.98, indicating minimal volatility.</li><li>The company's debt-to-equity ratio is not provided, but the stable price movement suggests a manageable debt level.</li><li>The price-to-earnings (P/E) ratio is not available, but the stock's price movement suggests a reasonable valuation.</li><li>and <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> prospects, we recommend **<span class="accumulate-tag">Accumulate</span> on dips**.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #f59e0b;">
+            <div class="analysis-section-title" style="color: #f59e0b;">
+                <span class="analysis-icon">⚠️</span>
+                Key Catalysts & Risks
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>s & Risks
+The online education market in India is expected to grow by USD 8.53 billion from 2025-2029, driven by skill development and employment.</li><li>This <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> is likely to benefit EXCELSOFT, which operates in this market.</li><li>However, the <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> of the online education market in India may be <span class="negative-keyword">challenge</span>d by factors such as increasing competition, regulatory changes, and technological disruptions.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #8b5cf6;">
+            <div class="analysis-section-title" style="color: #8b5cf6;">
+                <span class="analysis-icon">📈</span>
+                Position Analysis
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>The client's current position in EXCELSOFT is <span class="<span class="positive-keyword">positive</span>-keyword">profitable</span>, with a total P&L of ₹345.0.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #06b6d4;">
+            <div class="analysis-section-title" style="color: #06b6d4;">
+                <span class="analysis-icon">🔮</span>
+                Outlook
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Our 12-month forecast for EXCELSOFT is **<span class="<span class="positive-keyword">positive</span>-keyword">bullish</span>**, driven by the <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> prospects of the online education market in India.</li><li>We expect the company's revenue and EPS to grow in line with the market, driven by increasing demand for online education services.</li><li>The stock's valuation is likely to remain stable, with a potential <span class="<span class="positive-keyword">positive</span>-keyword">upside</span> driven by the company's <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> prospects.</li><li>We expect the stock price to reach ₹140.00 over the next 12 months, representing a potential return of 14.0% from the current price.</li>
+                </ul>
+            </div>
+        </div>
+        </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <span class="number">4.2</span>
+                TATASTEEL - Detailed Analysis
+            </div>
+            
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-name">TATASTEEL</div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Position</div>
+                        <div class="metric-value">1.0 shares</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Avg. Cost</div>
+                        <div class="metric-value">₹161.87</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Current Price</div>
+                        <div class="metric-value">₹169.15</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Net P&L</div>
+                        <div class="metric-value positive-value">₹7.28</div>
+                    </div>
+                </div>
+        
+                <div class="chart-container">
+                    <img src="C:\Users\lenovo\OneDrive\Desktop\Hrishi\hacks\backend\KiteInfi\src\kite\portrep\portreport\viz\charts\stock_analysis_TATASTEEL.png" alt="TATASTEEL Technical Analysis">
+                </div>
+            
+                <div class="subsection-title">Research & Analysis</div>
+                <div class="analysis-container">
+        <div class="analysis-section" style="border-left-color: #10b981;">
+            <div class="analysis-section-title" style="color: #10b981;">
+                <span class="analysis-icon">📊</span>
+                Investment Verdict
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>is based on the company's recent earnings report, which demonstrated a 10% year-over-year (YoY) increase in consolidated EBITDA to INR 25,802 crore, driven by volume <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> in India despite challenging steel spreads.
+
+ Financial Health Assessment
+Tata Steel's financial health is robust, with a significant increase in EBITDA, which suggests a strong operational performance.</li><li>The company's ability to deliver EBITDA margin expansion in a low steel spread environment is a testament to its cost management and efficiency initiatives.</li><li>However, we note that the debt-to-equity ratio is not provided, which is a critical metric for assessing the company's leverage and financial flexibility.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #f59e0b;">
+            <div class="analysis-section-title" style="color: #f59e0b;">
+                <span class="analysis-icon">⚠️</span>
+                Key Catalysts & Risks
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>s & Risks
+Recent developments suggest a favorable industry trend, with the global steel wire market expected to surpass $115 billion by 2029, driven by increased demand in construction, automotive, and energy sectors.</li><li>This trend is likely to benefit Tata Steel, given its diversified product portfolio and global presence.</li><li>However, we note that the company is not immune to fluctuations in steel prices, which can impact its profitability.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #8b5cf6;">
+            <div class="analysis-section-title" style="color: #8b5cf6;">
+                <span class="analysis-icon">📈</span>
+                Position Analysis
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Given the client's current position, with a quantity of 1.0 and an average price of ₹161.87, we recommend accumulating on dips.</li><li>The current price of ₹169.15 represents a modest gain, and we believe that the stock has further <span class="<span class="positive-keyword">positive</span>-keyword">upside</span> potential, driven by the company's <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> prospects and industry trends.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #06b6d4;">
+            <div class="analysis-section-title" style="color: #06b6d4;">
+                <span class="analysis-icon">🔮</span>
+                Outlook
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Our 12-month forecast for Tata Steel is <span class="<span class="positive-keyword">positive</span>-keyword">bullish</span>, driven by the company's <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> prospects, industry trends, and its ability to deliver EBITDA margin expansion.</li><li>We expect the company's consolidated EBITDA to continue growing, driven by volume <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> in India and a gradual improvement in steel spreads.</li><li>However, we note that the company's profitability may be impacted by fluctuations in steel prices, and the client should be prepared for potential volatility in the stock price.</li><li>Overall, we believe that Tata Steel is well-positioned to capitalize on the growing demand for steel products, and we expect the stock to outperform the market in the next 12 months.</li>
+                </ul>
+            </div>
+        </div>
+        </div>
+            </div>
+        </div>
+        </div><div class="page">
+        <div class="section">
+            <div class="section-title">
+                <span class="number">4.3</span>
+                INFY - Detailed Analysis
+            </div>
+            
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-name">INFY</div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Position</div>
+                        <div class="metric-value">2.0 shares</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Avg. Cost</div>
+                        <div class="metric-value">₹1,450.00</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Current Price</div>
+                        <div class="metric-value">₹1,472.40</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Net P&L</div>
+                        <div class="metric-value positive-value">₹44.80</div>
+                    </div>
+                </div>
+        
+                <div class="chart-container">
+                    <img src="C:\Users\lenovo\OneDrive\Desktop\Hrishi\hacks\backend\KiteInfi\src\kite\portrep\portreport\viz\charts\stock_analysis_INFY.png" alt="INFY Technical Analysis">
+                </div>
+            
+                <div class="subsection-title">Research & Analysis</div>
+                <div class="analysis-container">
+        <div class="analysis-section" style="border-left-color: #10b981;">
+            <div class="analysis-section-title" style="color: #10b981;">
+                <span class="analysis-icon">📊</span>
+                Investment Verdict
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>We maintain a **<span class="buy-tag">Buy</span>** rating on Infosys Limited (INFY), citing the company's ability to navigate anticipated <span class="negative-keyword">decline</span>s in third-party revenue and its investments in AI and cloud technology, which are expected to unlock larger, higher-margin deals and expand recurring revenue streams.
+
+ Financial Health Assessment
+INFY's financial health is robust, with a profit margin of 16.58% and a return on assets (ttm) of 14.86%.</li><li>The company's valuation, however, may face headwinds, with a price-to-sales (ttm) ratio that may be considered elevated.</li><li>We note that the return on equity (ttm) is not provided, but the debt-to-equity ratio is not explicitly mentioned, suggesting a potentially conservative capital structure.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #f59e0b;">
+            <div class="analysis-section-title" style="color: #f59e0b;">
+                <span class="analysis-icon">⚠️</span>
+                Key Catalysts & Risks
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>s & Risks
+Key catalysts for INFY include its ability to maintain <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> momentum, driven by its investments in AI and cloud technology, as well as its ability to navigate anticipated <span class="negative-keyword">decline</span>s in third-party revenue.</li><li>s include potential valuation headwinds, given the company's price-to-sales (ttm) ratio, as well as the general uncertainty surrounding the IT spending landscape.</li><li>s to our outlook.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #8b5cf6;">
+            <div class="analysis-section-title" style="color: #8b5cf6;">
+                <span class="analysis-icon">📈</span>
+                Position Analysis
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Given the client's current position, with a quantity of 2.0 shares, an average price of ₹1450.0, and a current price of ₹1472.4, resulting in a total P&L of ₹44.8, we recommend **<span class="accumulate-tag">Accumulate</span> on dips**.</li><li>The client's existing position is relatively small, and the recent price action suggests that the stock may be due for a pullback.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #06b6d4;">
+            <div class="analysis-section-title" style="color: #06b6d4;">
+                <span class="analysis-icon">🔮</span>
+                Outlook
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Our 12-month forecast for INFY is **<span class="<span class="positive-keyword">positive</span>-keyword">bullish</span>**, driven by the company's <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> momentum, investments in AI and cloud technology, and its ability to navigate anticipated <span class="negative-keyword">decline</span>s in third-party revenue.</li><li>We expect the stock to outperform its peers, with potential <span class="<span class="positive-keyword">positive</span>-keyword">upside</span> to the recently revised consensus analyst price target of ₹1,704.36.</li>
+                </ul>
+            </div>
+        </div>
+        </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <span class="number">4.4</span>
+                HDFCBANK - Detailed Analysis
+            </div>
+            
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-name">HDFCBANK</div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Position</div>
+                        <div class="metric-value">3.0 shares</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Avg. Cost</div>
+                        <div class="metric-value">₹1,500.00</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Current Price</div>
+                        <div class="metric-value">₹1,528.50</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Net P&L</div>
+                        <div class="metric-value positive-value">₹85.50</div>
+                    </div>
+                </div>
+        
+                <div class="chart-container">
+                    <img src="C:\Users\lenovo\OneDrive\Desktop\Hrishi\hacks\backend\KiteInfi\src\kite\portrep\portreport\viz\charts\stock_analysis_HDFCBANK.png" alt="HDFCBANK Technical Analysis">
+                </div>
+            
+                <div class="subsection-title">Research & Analysis</div>
+                <div class="analysis-container">
+        <div class="analysis-section" style="border-left-color: #10b981;">
+            <div class="analysis-section-title" style="color: #10b981;">
+                <span class="analysis-icon">📊</span>
+                Investment Verdict
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Based on the provided data and recent developments, we maintain a **<span class="buy-tag">Buy</span>** rating for HDFCBANK.</li><li>and recommend a long-term investment approach for HDFCBANK.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #3b82f6;">
+            <div class="analysis-section-title" style="color: #3b82f6;">
+                <span class="analysis-icon">💰</span>
+                Financial Health Assessment
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Assessment
+HDFCBANK's financial health appears stable, with a strong track record of loan <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> and improving asset quality.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #f59e0b;">
+            <div class="analysis-section-title" style="color: #f59e0b;">
+                <span class="analysis-icon">⚠️</span>
+                Key Catalysts & Risks
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>management framework.</li><li>s & Risks
+Recent developments, such as the Q2 FY26 earnings report, highlight HDFCBANK's strong loan <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> and stable asset quality.</li><li>to the bank's profitability.</li><li>Additionally, the overall market sentiment and macroeconomic factors, such as interest rate changes and regulatory developments, may impact the stock's performance.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #8b5cf6;">
+            <div class="analysis-section-title" style="color: #8b5cf6;">
+                <span class="analysis-icon">📈</span>
+                Position Analysis
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Given the client's current position, with a quantity of 3.0 shares, an average price of ₹1500.0, and a current price of ₹1528.5, resulting in a total P&L of ₹85.5, we recommend **<span class="accumulate-tag">Accumulate</span> on dips**.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #06b6d4;">
+            <div class="analysis-section-title" style="color: #06b6d4;">
+                <span class="analysis-icon">🔮</span>
+                Outlook
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>for the stock.</li><li>Our 12-month forecast for HDFCBANK is **<span class="<span class="positive-keyword">positive</span>-keyword">bullish</span>**, driven by the bank's strong loan <span class="<span class="positive-keyword">positive</span>-keyword">growth</span>, stable asset quality, and diversified product offerings.</li><li>We expect the bank to continue benefiting from India's growing economy and increasing demand for financial services.</li><li>While valuation headwinds may arise, we believe the bank's EBITDA margin expansion and revenue <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> will support a higher stock price over the long term.</li>
+                </ul>
+            </div>
+        </div>
+        </div>
+            </div>
+        </div>
+        </div><div class="page">
+    <div class="section">
+        <div class="section-title">
+            <span class="number">5</span>
+            Mutual Fund Portfolio Analysis
+        </div>
+    
+            <div class="subsection-title">Performance Overview</div>
+            <div class="chart-container">
+                <img src="C:\Users\lenovo\OneDrive\Desktop\Hrishi\hacks\backend\KiteInfi\src\kite\portrep\portreport\viz\charts\mf_performance_overview.png" alt="Mutual Fund Performance Overview">
+            </div>
+            <div class="subsection-title">Detailed Fund Analysis</div>
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-name">MOTILAL OSWAL MIDCAP FUND - DIRECT PLAN</div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Units</div>
+                        <div class="metric-value">96.56</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">NAV</div>
+                        <div class="metric-value">₹117.41</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Market Value</div>
+                        <div class="metric-value">₹11,337.44</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Gain</div>
+                        <div class="metric-value positive-value">3.07%</div>
+                    </div>
+                </div>
+                
+                <div class="analysis-container">
+        <div class="analysis-section" style="border-left-color: #10b981;">
+            <div class="analysis-section-title" style="color: #10b981;">
+                <span class="analysis-icon">📊</span>
+                Investment Verdict
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>We recommend a **<span class="hold-tag">Hold</span>** position for the Motilal Oswal Midcap Fund - Direct Plan, given the current market conditions and the fund's recent performance.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #3b82f6;">
+            <div class="analysis-section-title" style="color: #3b82f6;">
+                <span class="analysis-icon">💰</span>
+                Financial Health Assessment
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Assessment
+The fund's financial health is satisfactory, with a moderate P/E ratio compared to its peers.</li><li>The EPS <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> has been steady, but not spectacular, reflecting the <span class="negative-keyword">challenge</span>s faced by midcap companies in the current economic environment.</li><li>The Debt-to-Equity ratio is reasonable, indicating a balanced approach to leverage.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #f59e0b;">
+            <div class="analysis-section-title" style="color: #f59e0b;">
+                <span class="analysis-icon">⚠️</span>
+                Key Catalysts & Risks
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>s & Risks
+Recent developments in the market, such as the strong Q3 performance of Nuvama Wealth Management, suggest that the financial services sector is showing resilience.</li><li>However, the global economic landscape remains uncertain, and any escalation of tensions could negatively impact the fund's performance.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #8b5cf6;">
+            <div class="analysis-section-title" style="color: #8b5cf6;">
+                <span class="analysis-icon">📈</span>
+                Position Analysis
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Given the current holding of 96.559 units with a NAV of ₹117.4146, we recommend **Accumulating on dips**.</li><li>The current value of ₹11,337.44 represents a modest gain, and investors may consider adding to their position if the market experiences a correction.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #06b6d4;">
+            <div class="analysis-section-title" style="color: #06b6d4;">
+                <span class="analysis-icon">🔮</span>
+                Outlook
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Our 12-month forecast for the Motilal Oswal Midcap Fund - Direct Plan is **Cautiously Optimistic**.</li><li>We expect the fund to deliver returns in line with its peer group, driven by the potential for earnings <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> and valuation expansion.</li><li>However, investors must be prepared for possible market fluctuations and maintain a disciplined approach to investing.</li><li>With a well-diversified portfolio and a long-term horizon, investors can navigate the <span class="negative-keyword">challenge</span>s and opportunities presented by the midcap segment.</li>
+                </ul>
+            </div>
+        </div>
+        </div>
+            </div>
+            
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-name">MOTILAL OSWAL LARGE CAP FUND - DIRECT PLAN</div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Units</div>
+                        <div class="metric-value">808.84</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">NAV</div>
+                        <div class="metric-value">₹14.65</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Market Value</div>
+                        <div class="metric-value">₹11,849.85</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Gain</div>
+                        <div class="metric-value positive-value">7.73%</div>
+                    </div>
+                </div>
+                
+                <div class="analysis-container">
+        <div class="analysis-section" style="border-left-color: #10b981;">
+            <div class="analysis-section-title" style="color: #10b981;">
+                <span class="analysis-icon">📊</span>
+                Investment Verdict
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Based on our analysis, we recommend a **<span class="hold-tag">Hold</span>** on the Motilal Oswal Large Cap Fund - Direct Plan.</li><li>The fund's recent performance has been satisfactory, with a 7.73% gain, and the parent company's assets under management (AUM) have crossed ₹6.7 lakh crore.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #3b82f6;">
+            <div class="analysis-section-title" style="color: #3b82f6;">
+                <span class="analysis-icon">💰</span>
+                Financial Health Assessment
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Assessment
+The Motilal Oswal Financial Services Limited (MOTILALOFS.NS) has reported a significant increase in AUM, with annuity revenues forming 61% of total revenue.</li><li>This suggests a stable revenue stream and a potential for continued <span class="<span class="positive-keyword">positive</span>-keyword">growth</span>.</li><li>appears to be sound, with a growing AUM and a diverse revenue base.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #f59e0b;">
+            <div class="analysis-section-title" style="color: #f59e0b;">
+                <span class="analysis-icon">⚠️</span>
+                Key Catalysts & Risks
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>s & Risks
+Recent developments, such as the company's Q2 25/26 earnings report, suggest continued <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> from private credit.</li><li>s to the fund's performance.</li><li>The Securities and Exchange Board of India (SEBI) and the Reserve Bank of India (RBI) have become more proactive, which may impact the fund's operations and performance.</li><li>s and opportunities arising from regulatory changes, economic trends, and global events.</li><li>We expect the fund to maintain its current performance trajectory, with a potential for moderate <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> over the next 12 months.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #8b5cf6;">
+            <div class="analysis-section-title" style="color: #8b5cf6;">
+                <span class="analysis-icon">📈</span>
+                Position Analysis
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Given the current position of 808.836 units, with a current value of ₹11,849.85 and a gain of 7.73%, we recommend **holding** onto the existing position.</li><li>The fund's performance has been satisfactory, and the parent company's <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> prospects appear promising.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #06b6d4;">
+            <div class="analysis-section-title" style="color: #06b6d4;">
+                <span class="analysis-icon">🔮</span>
+                Outlook
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Our 12-month forecast for the Motilal Oswal Large Cap Fund - Direct Plan is **cautiously optimistic**.</li><li>The fund's investment strategy and portfolio composition are expected to remain relatively stable, with a focus on large-cap stocks.</li><li>as necessary.</li>
+                </ul>
+            </div>
+        </div>
+        </div>
+            </div>
+            
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-name">MOTILAL OSWAL SMALL CAP FUND - DIRECT PLAN</div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Units</div>
+                        <div class="metric-value">802.60</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">NAV</div>
+                        <div class="metric-value">₹14.59</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Market Value</div>
+                        <div class="metric-value">₹11,709.09</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Gain</div>
+                        <div class="metric-value positive-value">6.45%</div>
+                    </div>
+                </div>
+                
+                <div class="analysis-container">
+        <div class="analysis-section" style="border-left-color: #10b981;">
+            <div class="analysis-section-title" style="color: #10b981;">
+                <span class="analysis-icon">📊</span>
+                Investment Verdict
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>We maintain a **<span class="buy-tag">Buy</span>** rating on the Motilal Oswal Small Cap Fund - Direct Plan, given its impressive track record and the potential for continued <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> in the small-cap segment.</li><li>PAT, driven by a 36% YoY surge in asset and private wealth management.</li><li>The fund's NAV of ₹14.5889 and current value of ₹11,709.09 suggest a healthy financial position.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #3b82f6;">
+            <div class="analysis-section-title" style="color: #3b82f6;">
+                <span class="analysis-icon">💰</span>
+                Financial Health Assessment
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Assessment
+From a financial health perspective, the fund's performance is supported by the underlying companies' <span class="<span class="positive-keyword">positive</span>-keyword">growth</span>.</li><li>The Motilal Oswal Financial Services Ltd.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #f59e0b;">
+            <div class="analysis-section-title" style="color: #f59e0b;">
+                <span class="analysis-icon">⚠️</span>
+                Key Catalysts & Risks
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>s & Risks
+The key catalysts for the fund's performance include the <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> in the small-cap segment, driven by the increasing investor interest in this space.</li><li>The proactive stance of regulators such as SEBI and RBI is also expected to support the <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> of the mutual fund industry.</li><li>s associated with small-cap investments, such as higher volatility and liquidity <span class="negative-keyword">risk</span>s, must be carefully considered.</li><li>The recent earnings report of Motilal Oswal Financial Services Ltd.</li><li>s and adjust the portfolio accordingly.
+
+ Outlook
+Our 12-month forecast for the Motilal Oswal Small Cap Fund - Direct Plan is **<span class="positive-keyword">positive</span>**, driven by the <span class="<span class="positive-keyword">positive</span>-keyword">growth</span> prospects in the small-cap segment.</li><li>We expect the fund's NAV to continue growing, driven by the underlying companies' performance and the increasing investor interest in this space.</li><li>-adjusted performance, and we expect the fund to continue delivering strong returns in the medium term.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #8b5cf6;">
+            <div class="analysis-section-title" style="color: #8b5cf6;">
+                <span class="analysis-icon">📈</span>
+                Position Analysis
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>Given the client's current position in the Motilal Oswal Small Cap Fund - Direct Plan, with 802.603 units and a gain of 6.45%, we recommend **Accumulating on dips**.</li><li>The fund's performance has been relatively strong, and we expect the small-cap segment to continue growing in the medium term.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analysis-section" style="border-left-color: #06b6d4;">
+            <div class="analysis-section-title" style="color: #06b6d4;">
+                <span class="analysis-icon">🔮</span>
+                Outlook
+            </div>
+            <div class="analysis-content">
+                <ul class="analysis-list">
+        <li>accordingly.</li>
+                </ul>
+            </div>
+        </div>
+        </div>
+            </div>
+            
+    </div>
+    
+    <div class="footer">
+        <p>This report is generated automatically and is for informational purposes only.</p>
+        <p>Past performance does not guarantee future results. Please consult with a financial advisor before making investment decisions.</p>
+    </div>
+    </div>
+</body>
+</html>

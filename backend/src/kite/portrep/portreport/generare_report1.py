@@ -1,0 +1,840 @@
+# import json
+# import os
+# import asyncio
+# from datetime import datetime
+# from pathlib import Path
+# from src.kite.portrep.portreport.deepagent import DeepAgent
+# from src.kite.portrep.portreport.emailer import convert_md_to_pdf, send_email_with_attachment
+
+# # File Paths
+# SCRIPT_DIR = Path(__file__).parent
+# JSON_FILE = SCRIPT_DIR / "mcp_summary.json"
+# REPORT_FILE = SCRIPT_DIR / "portfolio_report.md"
+# CHARTS_DIR = SCRIPT_DIR / "viz" / "charts"
+
+# def load_data():
+#     if not JSON_FILE.exists():
+#         print(f"❌ Error: {JSON_FILE} not found.")
+#         return None
+#     with open(JSON_FILE, "r") as f:
+#         return json.load(f)
+
+# def format_currency(val):
+#     try:
+#         return f"₹{float(val):,.2f}"
+#     except:
+#         return str(val)
+
+# async def fetch_portfolio_data():
+#     """Step 1: Login to Kite and fetch portfolio data."""
+#     print("\n" + "="*60)
+#     print("STEP 1: FETCHING PORTFOLIO DATA")
+#     print("="*60)
+    
+#     try:
+#         from src.kite.portrep.portreport.filter_mcp_data import main as fetch_data
+        
+#         print("🔐 Logging into Kite and fetching portfolio...")
+#         await fetch_data()
+#         print("✅ Portfolio data fetched successfully")
+#         return True
+#     except Exception as e:
+#         print(f"❌ Failed to fetch portfolio data: {e}")
+#         return False
+
+# def generate_charts():
+#     """Step 2: Generate all charts."""
+#     print("\n" + "="*60)
+#     print("STEP 2: GENERATING CHARTS")
+#     print("="*60)
+    
+#     try:
+#         from src.kite.portrep.portreport.viz.generate_charts import PortfolioChartGenerator
+        
+#         if not JSON_FILE.exists():
+#             print(f"❌ Error: {JSON_FILE} not found!")
+#             return False
+        
+#         generator = PortfolioChartGenerator(JSON_FILE, CHARTS_DIR)
+#         charts = generator.generate_all_charts()
+        
+#         if charts:
+#             print(f"✅ Generated {len(charts)} charts successfully")
+#             return True
+#         else:
+#             print("⚠️ No charts were generated")
+#             return False
+            
+#     except Exception as e:
+#         print(f"❌ Failed to generate charts: {e}")
+#         import traceback
+#         traceback.print_exc()
+#         return False
+
+# def generate_markdown(data, analyses, mf_summary):
+#     profile = data.get("profile", {})
+#     holdings = data.get("holdings", [])
+#     mfs = data.get("mutual_funds", [])
+#     timestamp = data.get("timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+#     md = f"# Investment Portfolio Analysis Report\n\n"
+#     md += f"**Generated:** {timestamp}\n\n"
+    
+#     # --- SECTION 1: General Information ---
+#     md += "## 1. Client Profile & Account Summary\n\n"
+#     md += "| Parameter | Details |\n"
+#     md += "|---|---|\n"
+#     md += f"| **Client Name** | {profile.get('name', 'N/A')} |\n"
+#     md += f"| **Client ID** | {profile.get('user_id', 'N/A')} |\n"
+#     md += f"| **Brokerage** | {profile.get('broker', 'N/A')} |\n"
+#     md += f"| **Email Contact** | {profile.get('email', 'N/A')} |\n\n"
+    
+#     # --- SECTION 2: Market Sentiment Dashboard ---
+#     md += "## 2. Market Sentiment Dashboard\n\n"
+#     md += "Current Indian market overview with major indices performance and sentiment analysis.\n\n"
+    
+#     market_chart = CHARTS_DIR / "market_sentiment_dashboard.png"
+#     if market_chart.exists():
+#         md += f"![Market Sentiment Dashboard]({market_chart.absolute()})\n\n"
+#     else:
+#         md += "_Market sentiment chart not available._\n\n"
+    
+#     # Explanatory text
+#     md += "### Understanding the Dashboard\n\n"
+#     md += "**Top Left - Major Indices Performance:** Shows percentage change for key Indian indices (NIFTY 50, SENSEX, BANKNIFTY, etc.) over the selected period.\n\n"
+#     md += "**Top Right - NIFTY 50 vs India VIX:** Displays the inverse relationship between market performance and volatility. Higher VIX indicates increased market fear.\n\n"
+#     md += "**Bottom Left - Relative Performance:** Compares normalized performance of different indices from a common starting point (100).\n\n"
+#     md += "**Bottom Right - Fear & Greed Index:** Market sentiment gauge based on India VIX. Extreme Fear (<25) suggests buying opportunity, Extreme Greed (>75) suggests caution.\n\n"
+    
+#     md += "<div style=\"page-break-after: always;\"></div>\n\n"
+    
+#     # --- SECTION 3: Portfolio Overview ---
+#     md += "## 3. Portfolio Performance Overview\n\n"
+    
+#     # Portfolio summary
+#     total_investment = sum(h['qty'] * h['avg'] for h in holdings)
+#     current_value = sum(h['qty'] * h['ltp'] for h in holdings)
+#     total_pnl = sum(h['pnl'] for h in holdings)
+#     pnl_pct = (total_pnl / total_investment * 100) if total_investment > 0 else 0
+    
+#     md += f"**Total Investment:** {format_currency(total_investment)}  \n"
+#     md += f"**Current Value:** {format_currency(current_value)}  \n"
+#     md += f"**Total P&L:** {format_currency(total_pnl)} ({pnl_pct:+.2f}%)  \n\n"
+    
+#     md += "### Portfolio Performance Chart\n\n"
+#     md += "Year-to-date performance tracking of your equity holdings with benchmark comparison.\n\n"
+    
+#     portfolio_chart = CHARTS_DIR / "portfolio_performance_tracker.png"
+#     if portfolio_chart.exists():
+#         md += f"![Portfolio Performance Tracker]({portfolio_chart.absolute()})\n\n"
+#     else:
+#         md += "_Portfolio performance chart not available._\n\n"
+    
+#     md += "### Holdings Summary\n\n"
+#     md += "| Symbol | Quantity | Avg. Cost | Current Price | Net P&L |\n"
+#     md += "|---|---|---|---|---|\n"
+#     for h in holdings:
+#         md += f"| **{h['symbol']}** | {h['qty']} | {format_currency(h['avg'])} | {format_currency(h['ltp'])} | {format_currency(h['pnl'])} |\n"
+#     md += "\n<div style=\"page-break-after: always;\"></div>\n\n"
+    
+#     # --- SECTION 4: Individual Stock Analysis ---
+#     md += "## 4. Detailed Stock Analysis\n\n"
+#     md += "In-depth technical and fundamental analysis for each equity holding.\n\n"
+    
+#     for h in holdings:
+#         sym = h['symbol']
+#         analysis = analyses.get(f"STOCK_{sym}", "Analysis unavailable.")
+        
+#         md += f"### {sym}\n\n"
+#         md += f"**Position:** {h['qty']} shares @ {format_currency(h['avg'])} | **Current:** {format_currency(h['ltp'])} | **P&L:** {format_currency(h['pnl'])}\n\n"
+        
+#         # Technical chart
+#         stock_chart = CHARTS_DIR / f"stock_analysis_{sym}.png"
+#         if stock_chart.exists():
+#             md += f"![{sym} Technical Analysis]({stock_chart.absolute()})\n\n"
+        
+#         # AI Analysis
+#         md += "#### Research & Analysis\n\n"
+#         md += f"{analysis}\n\n"
+#         md += "---\n\n"
+    
+#     # --- SECTION 5: Mutual Fund Analysis ---
+#     md += "<div style=\"page-break-after: always;\"></div>\n\n"
+#     md += "## 5. Mutual Fund Portfolio Analysis\n\n"
+    
+#     if not mfs:
+#         md += "_No mutual fund holdings found._\n\n"
+#     else:
+#         # MF Performance Chart
+#         md += "### Performance Overview\n\n"
+#         mf_chart = CHARTS_DIR / "mf_performance_overview.png"
+#         if mf_chart.exists():
+#             md += f"![Mutual Fund Performance Overview]({mf_chart.absolute()})\n\n"
+#         else:
+#             md += "_Mutual fund performance chart not available._\n\n"
+        
+#         # Detailed Analysis for each MF
+#         md += "### Detailed Fund Analysis\n\n"
+#         md += "In-depth analysis of each mutual fund scheme in your portfolio.\n\n"
+        
+#         for m in mfs:
+#             scheme = m['scheme']
+#             analysis = analyses.get(f"MF_{scheme}", "Analysis unavailable.")
+            
+#             md += f"#### {scheme}\n\n"
+#             md += f"**Holdings:** {m['units']:.2f} units | **NAV:** {format_currency(m['nav'])} | **Market Value:** {format_currency(m['value'])} | **Gain:** {m['gain_pct']:.2f}%\n\n"
+            
+#             # AI Analysis
+#             md += f"{analysis}\n\n"
+#             md += "---\n\n"
+    
+#     return md
+
+# async def main_async():
+#     """Main async function - handles login and data fetching."""
+#     print("\n" + "="*70)
+#     print(" " * 15 + "PORTFOLIO REPORT GENERATOR")
+#     print("="*70)
+#     print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+#     print("="*70)
+    
+#     # Step 1: Fetch portfolio data (Login + Fetch)
+#     if not await fetch_portfolio_data():
+#         print("\n❌ FAILED: Could not fetch portfolio data")
+#         print("Please check your Kite credentials and try again.")
+#         return
+    
+#     # Step 2: Generate charts
+#     if not generate_charts():
+#         print("\n⚠️ WARNING: Chart generation failed")
+#         print("Continuing with report generation (without charts)...")
+    
+#     # Step 3: Generate and email report
+#     print("\n" + "="*60)
+#     print("STEP 3: GENERATING REPORT")
+#     print("="*60)
+    
+#     print("🚀 Creating Portfolio Report...")
+    
+#     # Load Data
+#     data = load_data()
+#     if not data:
+#         print("\n❌ FAILED: Could not load portfolio data")
+#         return
+
+#     agent = DeepAgent()
+#     analyses = {}
+    
+#     # Prepare portfolio summary
+#     portfolio_summary = "Equity Holdings:\n"
+
+#     # Analyze Stocks (Detailed)
+#     print("\n📦 Analyzing Equity Holdings...")
+#     for h in data.get("holdings", []):
+#         sym = h['symbol']
+#         details = f"Quantity: {h['qty']}, Average Price: ₹{h['avg']}, Current Price: ₹{h['ltp']}, Total P&L: ₹{h['pnl']}"
+#         portfolio_summary += f"- {sym}: {details}\n"
+        
+#         print(f"   - Analyzing {sym}...")
+#         try:
+#             analyses[f"STOCK_{sym}"] = agent.analyze_asset(sym, "Stock", details)
+#         except Exception as e:
+#             print(f"     ❌ Failed: {e}")
+#             analyses[f"STOCK_{sym}"] = f"Error analyzing {sym}: {str(e)}"
+
+#     # Analyze Mutual Funds (Detailed)
+#     print("\n🏦 Analyzing Mutual Funds...")
+#     mfs = data.get("mutual_funds", [])
+    
+#     for m in mfs:
+#         scheme = m['scheme']
+#         details = f"Units: {m['units']}, NAV: ₹{m['nav']}, Current Value: ₹{m['value']}, Gain: {m['gain_pct']}%"
+        
+#         print(f"   - Analyzing {scheme[:30]}...")
+#         try:
+#             analyses[f"MF_{scheme}"] = agent.analyze_asset(scheme, "Mutual Fund", details)
+#         except Exception as e:
+#             print(f"     ❌ Failed: {e}")
+#             analyses[f"MF_{scheme}"] = f"Error analyzing {scheme}: {str(e)}"
+
+#     # Generate Markdown
+#     print("\n📝 Compiling Report...")
+#     markdown_content = generate_markdown(data, analyses, "")
+
+#     # Save Report
+#     with open(REPORT_FILE, "w", encoding="utf-8") as f:
+#         f.write(markdown_content)
+    
+#     print(f"\n✅ Report generated: {REPORT_FILE}")
+
+#     # Convert to PDF and Email
+#     print("\n📧 Preparing Email...")
+#     try:
+#         pdf_file = str(REPORT_FILE).replace(".md", ".pdf")
+#         convert_md_to_pdf(markdown_content, pdf_file)
+        
+#         user_email = data.get("profile", {}).get("email")
+#         if user_email:
+#             print(f"   - Sending to: {user_email}")
+#             send_email_with_attachment(
+#                 to_addr=user_email,
+#                 subject=f"Portfolio Analysis Report - {datetime.now().strftime('%Y-%m-%d')}",
+#                 body="Please find attached your detailed portfolio analysis report with market insights and comprehensive analysis.",
+#                 attachment_path=pdf_file
+#             )
+#         else:
+#             print("   ⚠️ No email found in profile. Skipping email.")
+            
+#     except Exception as e:
+#         print(f"   ❌ Email/PDF failed: {e}")
+    
+#     # Success!
+#     print("\n" + "="*70)
+#     print("🎉 SUCCESS! Portfolio report generated and emailed!")
+#     print("="*70)
+#     print(f"Completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+# def main():
+#     """Main entry point."""
+#     try:
+#         asyncio.run(main_async())
+#     except KeyboardInterrupt:
+#         print("\n\n⚠️ Process interrupted by user")
+    
+#     md += "<div style=\"page-break-after: always;\"></div>\n\n"
+    
+#     # --- SECTION 3: Portfolio Overview ---
+#     md += "## 3. Portfolio Performance Overview\n\n"
+    
+#     # Portfolio summary
+#     total_investment = sum(h['qty'] * h['avg'] for h in holdings)
+#     current_value = sum(h['qty'] * h['ltp'] for h in holdings)
+#     total_pnl = sum(h['pnl'] for h in holdings)
+#     pnl_pct = (total_pnl / total_investment * 100) if total_investment > 0 else 0
+    
+#     md += f"**Total Investment:** {format_currency(total_investment)}  \n"
+#     md += f"**Current Value:** {format_currency(current_value)}  \n"
+#     md += f"**Total P&L:** {format_currency(total_pnl)} ({pnl_pct:+.2f}%)  \n\n"
+    
+#     md += "### Portfolio Performance Chart\n\n"
+#     md += "Year-to-date performance tracking of your equity holdings with benchmark comparison.\n\n"
+    
+#     portfolio_chart = CHARTS_DIR / "portfolio_performance_tracker.png"
+#     if portfolio_chart.exists():
+#         md += f"![Portfolio Performance Tracker]({portfolio_chart.absolute()})\n\n"
+#     else:
+#         md += "_Portfolio performance chart not available._\n\n"
+    
+#     md += "### Holdings Summary\n\n"
+#     md += "| Symbol | Quantity | Avg. Cost | Current Price | Net P&L |\n"
+#     md += "|---|---|---|---|---|\n"
+#     for h in holdings:
+#         md += f"| **{h['symbol']}** | {h['qty']} | {format_currency(h['avg'])} | {format_currency(h['ltp'])} | {format_currency(h['pnl'])} |\n"
+#     md += "\n<div style=\"page-break-after: always;\"></div>\n\n"
+    
+#     # --- SECTION 4: Individual Stock Analysis ---
+#     md += "## 4. Detailed Stock Analysis\n\n"
+#     md += "In-depth technical and fundamental analysis for each equity holding.\n\n"
+    
+#     for h in holdings:
+#         sym = h['symbol']
+#         analysis = analyses.get(f"STOCK_{sym}", "Analysis unavailable.")
+        
+#         md += f"### {sym}\n\n"
+#         md += f"**Position:** {h['qty']} shares @ {format_currency(h['avg'])} | **Current:** {format_currency(h['ltp'])} | **P&L:** {format_currency(h['pnl'])}\n\n"
+        
+#         # Technical chart
+#         stock_chart = CHARTS_DIR / f"stock_analysis_{sym}.png"
+#         if stock_chart.exists():
+#             md += f"![{sym} Technical Analysis]({stock_chart.absolute()})\n\n"
+        
+#         # AI Analysis
+#         md += "#### Research & Analysis\n\n"
+#         md += f"{analysis}\n\n"
+#         md += "---\n\n"
+    
+#     # --- SECTION 5: Mutual Fund Analysis ---
+#     md += "<div style=\"page-break-after: always;\"></div>\n\n"
+#     md += "## 5. Mutual Fund Portfolio Analysis\n\n"
+    
+#     if not mfs:
+#         md += "_No mutual fund holdings found._\n\n"
+#     else:
+#         # MF Performance Chart
+#         md += "### Performance Overview\n\n"
+#         mf_chart = CHARTS_DIR / "mf_performance_overview.png"
+#         if mf_chart.exists():
+#             md += f"![Mutual Fund Performance Overview]({mf_chart.absolute()})\n\n"
+#         else:
+#             md += "_Mutual fund performance chart not available._\n\n"
+        
+#         # Detailed Analysis for each MF
+#         md += "### Detailed Fund Analysis\n\n"
+#         md += "In-depth analysis of each mutual fund scheme in your portfolio.\n\n"
+        
+#         for m in mfs:
+#             scheme = m['scheme']
+#             analysis = analyses.get(f"MF_{scheme}", "Analysis unavailable.")
+            
+#             md += f"#### {scheme}\n\n"
+#             md += f"**Holdings:** {m['units']:.2f} units | **NAV:** {format_currency(m['nav'])} | **Market Value:** {format_currency(m['value'])} | **Gain:** {m['gain_pct']:.2f}%\n\n"
+            
+#             # AI Analysis
+#             md += f"{analysis}\n\n"
+#             md += "---\n\n"
+    
+#     return md
+
+# async def main_async():
+#     """Main async function - handles login and data fetching."""
+#     print("\n" + "="*70)
+#     print(" " * 15 + "PORTFOLIO REPORT GENERATOR")
+#     print("="*70)
+#     print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+#     print("="*70)
+    
+#     # Step 1: Fetch portfolio data (Login + Fetch)
+#     if not await fetch_portfolio_data():
+#         print("\n❌ FAILED: Could not fetch portfolio data")
+#         print("Please check your Kite credentials and try again.")
+#         return
+    
+#     # Step 2: Generate charts
+#     if not generate_charts():
+#         print("\n⚠️ WARNING: Chart generation failed")
+#         print("Continuing with report generation (without charts)...")
+    
+#     # Step 3: Generate and email report
+#     print("\n" + "="*60)
+#     print("STEP 3: GENERATING REPORT")
+#     print("="*60)
+    
+#     print("🚀 Creating Portfolio Report...")
+    
+#     # Load Data
+#     data = load_data()
+#     if not data:
+#         print("\n❌ FAILED: Could not load portfolio data")
+#         return
+
+#     agent = DeepAgent()
+#     analyses = {}
+    
+#     # Prepare portfolio summary
+#     portfolio_summary = "Equity Holdings:\n"
+
+#     # Analyze Stocks (Detailed)
+#     print("\n📦 Analyzing Equity Holdings...")
+#     for h in data.get("holdings", []):
+#         sym = h['symbol']
+#         details = f"Quantity: {h['qty']}, Average Price: ₹{h['avg']}, Current Price: ₹{h['ltp']}, Total P&L: ₹{h['pnl']}"
+#         portfolio_summary += f"- {sym}: {details}\n"
+        
+#         print(f"   - Analyzing {sym}...")
+#         try:
+#             analyses[f"STOCK_{sym}"] = agent.analyze_asset(sym, "Stock", details)
+#         except Exception as e:
+#             print(f"     ❌ Failed: {e}")
+#             analyses[f"STOCK_{sym}"] = f"Error analyzing {sym}: {str(e)}"
+
+#     # Analyze Mutual Funds (Detailed)
+#     print("\n🏦 Analyzing Mutual Funds...")
+#     mfs = data.get("mutual_funds", [])
+    
+#     for m in mfs:
+#         scheme = m['scheme']
+#         details = f"Units: {m['units']}, NAV: ₹{m['nav']}, Current Value: ₹{m['value']}, Gain: {m['gain_pct']}%"
+        
+#         print(f"   - Analyzing {scheme[:30]}...")
+#         try:
+#             analyses[f"MF_{scheme}"] = agent.analyze_asset(scheme, "Mutual Fund", details)
+#         except Exception as e:
+#             print(f"     ❌ Failed: {e}")
+#             analyses[f"MF_{scheme}"] = f"Error analyzing {scheme}: {str(e)}"
+
+#     # Generate Markdown
+#     print("\n📝 Compiling Report...")
+#     markdown_content = generate_markdown(data, analyses, "")
+
+#     # Save Report
+#     with open(REPORT_FILE, "w", encoding="utf-8") as f:
+#         f.write(markdown_content)
+    
+#     print(f"\n✅ Report generated: {REPORT_FILE}")
+
+#     # Convert to PDF and Email
+#     print("\n📧 Preparing Email...")
+#     try:
+#         pdf_file = str(REPORT_FILE).replace(".md", ".pdf")
+#         convert_md_to_pdf(markdown_content, pdf_file)
+        
+#         user_email = data.get("profile", {}).get("email")
+#         if user_email:
+#             print(f"   - Sending to: {user_email}")
+#             send_email_with_attachment(
+#                 to_addr=user_email,
+#                 subject=f"Portfolio Analysis Report - {datetime.now().strftime('%Y-%m-%d')}",
+#                 body="Please find attached your detailed portfolio analysis report with market insights and comprehensive analysis.",
+#                 attachment_path=pdf_file
+#             )
+#         else:
+#             print("   ⚠️ No email found in profile. Skipping email.")
+            
+#     except Exception as e:
+#         print(f"   ❌ Email/PDF failed: {e}")
+    
+#     # Success!
+#     print("\n" + "="*70)
+#     print("🎉 SUCCESS! Portfolio report generated and emailed!")
+#     print("="*70)
+#     print(f"Completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+# def main():
+#     """Main entry point."""
+#     try:
+#         asyncio.run(main_async())
+#     except KeyboardInterrupt:
+#         print("\n\n⚠️ Process interrupted by user")
+#     except Exception as e:
+#         print(f"\n\n❌ Unexpected error: {e}")
+#         import traceback
+#         traceback.print_exc()
+
+# if __name__ == "__main__":
+#     main()
+
+
+
+
+
+
+
+
+
+
+import json
+import asyncio
+from datetime import datetime
+from pathlib import Path
+
+from src.kite.portrep.portreport.deepagent import DeepAgent
+from src.kite.portrep.portreport.emailer import convert_md_to_pdf, send_email_with_attachment
+
+# File Paths
+SCRIPT_DIR = Path(__file__).parent
+JSON_FILE = SCRIPT_DIR / "mcp_summary.json"
+REPORT_FILE = SCRIPT_DIR / "portfolio_report.md"
+CHARTS_DIR = SCRIPT_DIR / "viz" / "charts"
+
+
+def load_data():
+    if not JSON_FILE.exists():
+        print(f"❌ Error: {JSON_FILE} not found.")
+        return None
+    with open(JSON_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def format_currency(val):
+    try:
+        return f"₹{float(val):,.2f}"
+    except Exception:
+        return str(val)
+
+
+async def fetch_portfolio_data():
+    """Step 1: Login to Kite and fetch portfolio data."""
+    print("\n" + "=" * 60)
+    print("STEP 1: FETCHING PORTFOLIO DATA")
+    print("=" * 60)
+
+    try:
+        from src.kite.portrep.portreport.filter_mcp_data import main as fetch_data
+
+        print("🔐 Logging into Kite and fetching portfolio...")
+        await fetch_data()
+        print("✅ Portfolio data fetched successfully")
+        return True
+    except Exception as e:
+        print(f"❌ Failed to fetch portfolio data: {e}")
+        return False
+
+
+def generate_charts():
+    """Step 2: Generate all charts."""
+    print("\n" + "=" * 60)
+    print("STEP 2: GENERATING CHARTS")
+    print("=" * 60)
+
+    try:
+        from src.kite.portrep.portreport.viz.generate_charts import PortfolioChartGenerator
+
+        if not JSON_FILE.exists():
+            print(f"❌ Error: {JSON_FILE} not found!")
+            return False
+
+        generator = PortfolioChartGenerator(JSON_FILE, CHARTS_DIR)
+        charts = generator.generate_all_charts()
+
+        if charts:
+            print(f"✅ Generated {len(charts)} charts successfully")
+            return True
+        else:
+            print("⚠️ No charts were generated")
+            return False
+
+    except Exception as e:
+        print(f"❌ Failed to generate charts: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
+def generate_markdown(data, analyses, mf_summary):
+    profile = data.get("profile", {})
+    holdings = data.get("holdings", [])
+    mfs = data.get("mutual_funds", [])
+    timestamp = data.get("timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+    md = "# Investment Portfolio Analysis Report\n\n"
+    md += f"**Generated:** {timestamp}\n\n"
+
+    # --- SECTION 1: General Information ---
+    md += "## 1. Client Profile & Account Summary\n\n"
+    md += "| Parameter | Details |\n"
+    md += "|---|---|\n"
+    md += f"| **Client Name** | {profile.get('name', 'N/A')} |\n"
+    md += f"| **Client ID** | {profile.get('user_id', 'N/A')} |\n"
+    md += f"| **Brokerage** | {profile.get('broker', 'N/A')} |\n"
+    md += f"| **Email Contact** | {profile.get('email', 'N/A')} |\n\n"
+
+    # --- SECTION 2: Market Sentiment Dashboard ---
+    md += "## 2. Market Sentiment Dashboard\n\n"
+    md += "Current Indian market overview with major indices performance and sentiment analysis.\n\n"
+
+    market_chart = CHARTS_DIR / "market_sentiment_dashboard.png"
+    if market_chart.exists():
+        md += f"![Market Sentiment Dashboard]({market_chart.absolute()})\n\n"
+    else:
+        md += "_Market sentiment chart not available._\n\n"
+
+    md += "### Understanding the Dashboard\n\n"
+    md += (
+        "**Top Left - Major Indices Performance:** Shows percentage change for key "
+        "Indian indices (NIFTY 50, SENSEX, BANKNIFTY, etc.) over the selected period.\n\n"
+    )
+    md += (
+        "**Top Right - NIFTY 50 vs India VIX:** Displays the inverse relationship "
+        "between market performance and volatility. Higher VIX indicates increased market fear.\n\n"
+    )
+    md += (
+        "**Bottom Left - Relative Performance:** Compares normalized performance of "
+        "different indices from a common starting point (100).\n\n"
+    )
+    md += (
+        "**Bottom Right - Fear & Greed Index:** Market sentiment gauge based on "
+        "India VIX. Extreme Fear (<25) suggests buying opportunity, Extreme Greed (>75) suggests caution.\n\n"
+    )
+
+    md += '<div style="page-break-after: always;"></div>\n\n'
+
+    # --- SECTION 3: Portfolio Overview ---
+    md += "## 3. Portfolio Performance Overview\n\n"
+
+    total_investment = sum(h["qty"] * h["avg"] for h in holdings)
+    current_value = sum(h["qty"] * h["ltp"] for h in holdings)
+    total_pnl = sum(h["pnl"] for h in holdings)
+    pnl_pct = (total_pnl / total_investment * 100) if total_investment > 0 else 0
+
+    md += f"**Total Investment:** {format_currency(total_investment)}  \n"
+    md += f"**Current Value:** {format_currency(current_value)}  \n"
+    md += f"**Total P&L:** {format_currency(total_pnl)} ({pnl_pct:+.2f}%)  \n\n"
+
+    md += "### Portfolio Performance Chart\n\n"
+    md += "Year-to-date performance tracking of your equity holdings with benchmark comparison.\n\n"
+
+    portfolio_chart = CHARTS_DIR / "portfolio_performance_tracker.png"
+    if portfolio_chart.exists():
+        md += f"![Portfolio Performance Tracker]({portfolio_chart.absolute()})\n\n"
+    else:
+        md += "_Portfolio performance chart not available._\n\n"
+
+    md += "### Holdings Summary\n\n"
+    md += "| Symbol | Quantity | Avg. Cost | Current Price | Net P&L |\n"
+    md += "|---|---|---|---|---|\n"
+    for h in holdings:
+        md += (
+            f"| **{h['symbol']}** | {h['qty']} | {format_currency(h['avg'])} | "
+            f"{format_currency(h['ltp'])} | {format_currency(h['pnl'])} |\n"
+        )
+    md += '\n<div style="page-break-after: always;"></div>\n\n'
+
+    # --- SECTION 4: Individual Stock Analysis ---
+    md += "## 4. Detailed Stock Analysis\n\n"
+    md += "In-depth technical and fundamental analysis for each equity holding.\n\n"
+
+    for h in holdings:
+        sym = h["symbol"]
+        analysis = analyses.get(f"STOCK_{sym}", "Analysis unavailable.")
+
+        md += f"### {sym}\n\n"
+        md += (
+            f"**Position:** {h['qty']} shares @ {format_currency(h['avg'])} | "
+            f"**Current:** {format_currency(h['ltp'])} | "
+            f"**P&L:** {format_currency(h['pnl'])}\n\n"
+        )
+
+        stock_chart = CHARTS_DIR / f"stock_analysis_{sym}.png"
+        if stock_chart.exists():
+            md += f"![{sym} Technical Analysis]({stock_chart.absolute()})\n\n"
+
+        md += "#### Research & Analysis\n\n"
+        md += f"{analysis}\n\n"
+        md += "---\n\n"
+
+    # --- SECTION 5: Mutual Fund Analysis ---
+    md += '<div style="page-break-after: always;"></div>\n\n'
+    md += "## 5. Mutual Fund Portfolio Analysis\n\n"
+
+    if not mfs:
+        md += "_No mutual fund holdings found._\n\n"
+    else:
+        md += "### Performance Overview\n\n"
+        mf_chart = CHARTS_DIR / "mf_performance_overview.png"
+        if mf_chart.exists():
+            md += f"![Mutual Fund Performance Overview]({mf_chart.absolute()})\n\n"
+        else:
+            md += "_Mutual fund performance chart not available._\n\n"
+
+        md += "### Detailed Fund Analysis\n\n"
+        md += "In-depth analysis of each mutual fund scheme in your portfolio.\n\n"
+
+        for m in mfs:
+            scheme_name= m["scheme_name"]
+            analysis = analyses.get(f"MF_{scheme_name}", "Analysis unavailable.")
+
+            md += f"#### {scheme_name}\n\n"
+            md += (
+                f"**Holdings:** {m['units']:.2f} units | "
+                f"**NAV:** {format_currency(m['nav'])} | "
+                f"**Market Value:** {format_currency(m['value'])} | "
+                f"**Gain:** {m['gain_pct']:.2f}%\n\n"
+            )
+            md += f"{analysis}\n\n"
+            md += "---\n\n"
+
+    return md
+
+
+async def main_async():
+    """Main async function - generates report from existing data."""
+    print("🚀 Creating Portfolio Report...")
+    
+    # Load Data (already fetched by run_portfolio_report)
+    data = load_data()
+    if not data:
+        print("\n❌ FAILED: Could not load portfolio data")
+        return
+
+    agent = DeepAgent()
+    analyses = {}
+
+    # Analyze Stocks (Detailed)
+    print("\n📦 Analyzing Equity Holdings...")
+    for h in data.get("holdings", []):
+        sym = h["symbol"]
+        details = (
+            f"Quantity: {h['qty']}, Average Price: ₹{h['avg']}, "
+            f"Current Price: ₹{h['ltp']}, Total P&L: ₹{h['pnl']}"
+        )
+
+        print(f"   - Analyzing {sym}...")
+        try:
+            analyses[f"STOCK_{sym}"] = agent.analyze_asset(sym, "Stock", details)
+        except Exception as e:
+            print(f"     ❌ Failed: {e}")
+            analyses[f"STOCK_{sym}"] = f"Error analyzing {sym}: {str(e)}"
+
+    # Analyze Mutual Funds (Detailed)
+    print("\n🏦 Analyzing Mutual Funds...")
+    mfs = data.get("mutual_funds", [])
+
+    for m in mfs:
+        scheme_name = m["scheme_name"]
+        details = (
+            f"Units: {m['units']}, NAV: ₹{m['nav']}, "
+            f"Current Value: ₹{m['value']}, Gain: {m['gain_pct']}%"
+        )
+
+        print(f"   - Analyzing {scheme_name[:30]}...")
+        try:
+            analyses[f"MF_{scheme_name}"] = agent.analyze_asset(scheme_name, "Mutual Fund", details)
+        except Exception as e:
+            print(f"     ❌ Failed: {e}")
+            analyses[f"MF_{scheme_name}"] = f"Error analyzing {scheme_name}: {str(e)}"
+
+    # Generate Markdown
+    print("\n📝 Compiling Report...")
+    markdown_content = generate_markdown(data, analyses, "")
+
+    # Save Report
+    with open(REPORT_FILE, "w", encoding="utf-8") as f:
+        f.write(markdown_content)
+
+    print(f"\n✅ Report generated: {REPORT_FILE}")
+
+    # Convert to PDF and Email
+    print("\n📧 Preparing Email...")
+    try:
+        pdf_file = str(REPORT_FILE).replace(".md", ".pdf")
+        convert_md_to_pdf(markdown_content, pdf_file)
+
+        user_email = data.get("profile", {}).get("email")
+        if user_email:
+            print(f"   - Sending to: {user_email}")
+            send_email_with_attachment(
+                to_addr=user_email,
+                subject=f"Portfolio Analysis Report - {datetime.now().strftime('%Y-%m-%d')}",
+                body=(
+                    "Please find attached your detailed portfolio analysis report "
+                    "with market insights and comprehensive analysis."
+                ),
+                attachment_path=pdf_file,
+            )
+        else:
+            print("   ⚠️ No email found in profile. Skipping email.")
+
+    except Exception as e:
+        print(f"   ❌ Email/PDF failed: {e}")
+        import traceback
+        traceback.print_exc()
+
+
+def main():
+    """
+    Main entry point.
+
+    - If no event loop is running: uses asyncio.run(main_async()).
+    - If an event loop is already running (e.g. Jupyter/agent): schedules main_async()
+      on that loop to avoid `asyncio.run()` RuntimeError.
+    """
+    try:
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            # No running loop -> safe to use asyncio.run
+            asyncio.run(main_async())
+        else:
+            # Already inside a running event loop -> schedule task instead
+            return loop.create_task(main_async())
+
+    except KeyboardInterrupt:
+        print("\n\n⚠️ Process interrupted by user")
+    except Exception as e:
+        print(f"\n\n❌ Unexpected error: {e}")
+        import traceback
+        traceback.print_exc()
+
+
+if __name__ == "__main__":
+    main()
